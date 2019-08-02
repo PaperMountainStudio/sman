@@ -1,0 +1,50 @@
+#!/bin/sh
+# depends on: groff, gnu eqn, less
+: -e
+usage() {
+	echo "usage: man [section] name"
+}
+
+runman() {
+	name="$2"
+	section="$1"
+	manpath="/usr/share/man/man$section/$name.$section"
+	cat "$manpath" | eqn - | groff -mandoc -Tutf8 | less
+}
+
+if [ "$#" = 2 ]; then
+	case "$1" in
+	1|2|3|4|5|6|7|8)
+		echo yes
+		;;
+	*)
+		usage
+		exit 1
+	esac
+elif [ "$#" = 1 ]; then
+	name="$1"
+	if [ -f "/usr/share/man/man1/$name.1" ]; then
+		section=1
+	elif [ -f "/usr/share/man/man2/$name.2" ]; then
+		section=2
+	elif [ -f "/usr/share/man/man3/$name.3" ]; then
+		section=3
+	elif [ -f "/usr/share/man/man4/$name.4" ]; then
+		section=4
+	elif [ -f "/usr/share/man/man5/$name.5" ]; then
+		section=5
+	elif [ -f "/usr/share/man/man6/$name.6" ]; then
+		section=6
+	elif [ -f "/usr/share/man/man7/$name.7" ]; then
+		section=7
+	elif [ -f "/usr/share/man/man8/$name.8" ]; then
+		section=8
+	else
+		echo "man: No entry for $1 in the manual."
+		exit 1
+	fi
+	runman "$section" "$name"
+else
+	usage
+	exit 1
+fi
