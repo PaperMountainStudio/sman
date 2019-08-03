@@ -26,7 +26,7 @@ findmani() {
 }
 findman() {
     name="$1"
-    for i in 1 2 3 4 5 6 7 8; do
+    for i in 1 2 3 4 5 6 7 8 9; do
 	  manpath=$(findmani "$i" "$name")
 	  if [ "$?" -eq 0 ]; then
 	    echo "$manpath"
@@ -38,7 +38,7 @@ findman() {
 
 if [ "$#" = 2 ]; then
 	case "$1" in
-	1|2|3|4|5|6|7|8)
+	1|2|3|4|5|6|7|8|9)
 	    manpath=$(findmani "$1" "$2")
 	    if [ "$?" -eq 1 ]; then
 	      echo "man: No entry for $1 in the manual."
