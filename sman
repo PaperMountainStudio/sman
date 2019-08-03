@@ -1,43 +1,62 @@
 #!/bin/sh
 # depends on: groff, gnu eqn, less
-: -e
 usage() {
 	echo "usage: man [section] name"
 }
-mandirs="/usr/share/man /usr/local/share/man /data/data/com.termux/files/usr/share/man"
 
 runman() {
-	name="$2"
-	section="$1"
-	manpath="/usr/share/man/man$section/$name.$section"
+	manpath="$1"
 	cat "$manpath" | eqn - | groff -mandoc -Tutf8 | less
+}
+findmani() {
+    i="$1"
+    name="$2"
+    
+    oldifs="$IFS"
+	IFS=":"
+    for manpath in $MANPATH; do
+	    if [ -f "$manpath/man$i/$name.$i" ]; then
+		    echo "$manpath/man$i/$name.$i"
+		    return 0
+		else
+            return 1
+	    fi
+	done
+	IFS="$oldifs"
+}
+findman() {
+    name="$1"
+    for i in 1 2 3 4 5 6 7 8; do
+	  manpath=$(findmani "$i" "$name")
+	  if [ "$?" -eq 0 ]; then
+	    echo "$manpath"
+	    return 0
+	  fi
+	done
+	return 1
 }
 
 if [ "$#" = 2 ]; then
 	case "$1" in
 	1|2|3|4|5|6|7|8)
-		runman "$1" "$2"
+	    manpath=$(findmani "$1" "$2")
+	    if [ "$?" -eq 1 ]; then
+	      echo "man: No entry for $1 in the manual."
+	      exit 1
+        fi
+		runman "$manpath"
 		;;
 	*)
 		usage
 		exit 1
 	esac
 elif [ "$#" = 1 ]; then
-	name="$1"
-	for i in 1 2 3 4 5 6 7 8; do
-	  for mandir in $mandirs; do
-	        if [ -f "$mandir/man$i/$name.$i" ]; then
-		        section="$i"
-		    else
-		        echo "not found - $mandir/man$i/$name.$i"
-	        fi
-	    done
-	done
-	if [ -z "$section" ]; then
-		echo "man: No entry for $1 in the manual."
-		exit 1
-	fi
-	runman "$section" "$name"
+	manpath=$(findman $1)
+    if [ "$?" -eq 1 ]; then
+	  echo "man: No entry for $1 in the manual."
+	  exit 1
+    fi
+    runman "$manpath"
 else
 	usage
 	exit 1
