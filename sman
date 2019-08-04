@@ -10,6 +10,10 @@ command -v groff > /dev/null || err "groff not found"
 command -v eqn > /dev/null || err "eqn not found, you might want to install groff"
 command -v zcat > /dev/null || err "zcat not found, you might want to install gzip"
 
+if [ -z "$MANPATH" ]; then
+	err '$MANPATH not set'
+fi
+
 for pager in "$MANPAGER" "$PAGER" 'less' 'more'; do
     if [ -n "$pager" ]; then
         manpager="$pager"
