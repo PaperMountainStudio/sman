@@ -1,5 +1,5 @@
 - [ ] support for troff
-- [ ] support for manpages outside /usr/share/man/
+- [x] support for manpages outside /usr/share/man/
 - [ ] prettier code
-- [ ] use $PAGER instead of less
+- [x] use $PAGER instead of less
 - [ ] add -k option
