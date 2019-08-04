@@ -1,12 +1,19 @@
 #!/bin/sh
-# depends on: groff, gnu eqn, less
+# depends on: groff, gnu eqn, less, zcat
 usage() {
 	echo "usage: man [section] name"
 }
 
 runman() {
 	manpath="$1"
-	cat "$manpath" | eqn - | groff -mandoc -Tutf8 | less
+	case "$manpath" in
+	*.gz)
+	  rawtext=$(zcat "$manpath")
+	  ;;
+	*)
+	  rawtext=$(cat "$manpath")
+	esac
+	echo "$rawtext" | eqn - | groff -mandoc -Tutf8 | less
 }
 findmani() {
     i="$1"
@@ -17,6 +24,9 @@ findmani() {
     for manpath in $MANPATH; do
 	    if [ -f "$manpath/man$i/$name.$i" ]; then
 		    echo "$manpath/man$i/$name.$i"
+		    return 0
+		elif [ -f "$manpath/man$i/$name.$i.gz" ]; then
+		    echo "$manpath/man$i/$name.$i.gz"
 		    return 0
 		else
             return 1
