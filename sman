@@ -6,9 +6,9 @@ err() {
     exit 1
 }
 
-command -v groff || err "groff not found"
-command -v eqn || err "eqn not found, you might want to install groff"
-command -v zcat || err "zcat not found, you might want to install gzip"
+command -v groff > /dev/null || err "groff not found"
+command -v eqn > /dev/null || err "eqn not found, you might want to install groff"
+command -v zcat > /dev/null || err "zcat not found, you might want to install gzip"
 
 for pager in "$MANPAGER" "$PAGER" 'less' 'more'; do
     if [ -n "$pager" ]; then
