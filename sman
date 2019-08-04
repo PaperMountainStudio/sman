@@ -13,7 +13,7 @@ if [ -z "$MANPATH" ]; then
 	err '$MANPATH not set'
 fi
 
-for pager in "$MANPAGER" "$PAGER" 'less' 'more'; do
+for pager in "$MANPAGER" "$PAGER" 'less' 'more' 'cat'; do
     if [ -n "$pager" ]; then
         manpager="$pager"
         break
