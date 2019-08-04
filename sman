@@ -1,5 +1,5 @@
 #!/bin/sh
-# depends on: groff, gnu eqn, zcat, some pager
+# depends on: groff, zcat, some pager
 
 err() {
     echo "$@"
@@ -7,7 +7,6 @@ err() {
 }
 
 command -v groff > /dev/null || err "groff not found"
-command -v eqn > /dev/null || err "eqn not found, you might want to install groff"
 command -v zcat > /dev/null || err "zcat not found, you might want to install gzip"
 
 if [ -z "$MANPATH" ]; then
@@ -32,12 +31,12 @@ runman() {
 	manpath="$1"
 	case "$manpath" in
 	*.gz)
-	  rawtext=$(zcat "$manpath")
+		catcommand='zcat'
 	  ;;
 	*)
-	  rawtext=$(cat "$manpath")
+		catcommand='cat'
 	esac
-	echo "$rawtext" | eqn - | groff -mandoc -Tutf8 | "$manpager"
+	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | col -x  | "$manpager"
 }
 findmani() {
     i="$1"
