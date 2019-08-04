@@ -1,5 +1,16 @@
 #!/bin/sh
-# depends on: groff, gnu eqn, less, zcat
+# depends on: groff, gnu eqn, zcat, some pager
+
+for pager in "$MANPAGER" "$PAGER" 'less' 'more'; do
+    if [ -n "$pager" ]; then
+        manpager="$pager"
+        break
+    fi
+done
+if [ -z "$manpager" ]; then
+    echo 'man pager not found'
+fi
+
 usage() {
 	echo "usage: man [section] name"
 }
@@ -13,7 +24,7 @@ runman() {
 	*)
 	  rawtext=$(cat "$manpath")
 	esac
-	echo "$rawtext" | eqn - | groff -mandoc -Tutf8 | less
+	echo "$rawtext" | eqn - | groff -mandoc -Tutf8 | "$manpager"
 }
 findmani() {
     i="$1"
