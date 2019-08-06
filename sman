@@ -32,10 +32,10 @@ if [ -z "$MANPATH" ]; then
 fi
 
 # try to guess the best manpager
-for pager in "$MANPAGER" "$PAGER" 'less -R' 'more' 'cat'; do
+for pager in "$MANPAGER" "$PAGER" 'less -r' 'more' 'cat'; do
     if [ -n "$pager" ]; then
 		if [ "$pager" = "less" ]; then
-			pager='less -R'
+			pager='less -r'
 		fi
 
 		if command -v $(echo "$pager" | cut -d' ' -f1) > /dev/null; then
