@@ -63,7 +63,7 @@ runman() {
 	*)
 		catcommand='cat'
 	esac
-	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | col -x  | "$manpager"
+	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | "$manpager"
 }
 
 # usage: findmani SECTION NAME
