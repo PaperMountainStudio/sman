@@ -6,7 +6,7 @@ err() {
     exit 1
 }
 
-command -v groff > /dev/null || err "groff not found"
+command -v nroff > /dev/null || err "nroff not found, you might want to install groff"
 command -v zcat > /dev/null || err "zcat not found, you might want to install gzip"
 
 # if manpath is not set
