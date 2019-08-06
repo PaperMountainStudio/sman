@@ -2,7 +2,7 @@
 # depends on: groff, zcat, some pager
 
 err() {
-    echo "$@"
+    >&2 echo "$@"
     exit 1
 }
 
@@ -38,11 +38,11 @@ for pager in "$MANPAGER" "$PAGER" 'less' 'more' 'cat'; do
     fi
 done
 if [ -z "$manpager" ]; then
-    echo 'man pager not found'
+    err 'man pager not found'
 fi
 
 usage() {
-	echo "usage: man [section] name"
+	err "usage: man [section] name"
 }
 
 runman() {
@@ -92,7 +92,7 @@ if [ "$#" = 2 ]; then
 	1|2|3|4|5|6|7|8|9)
 	    manpath=$(findmani "$1" "$2")
 	    if [ "$?" -eq 1 ]; then
-	      echo "man: No entry for $1 in the manual."
+	      err "man: No entry for $1 in the manual."
 	      exit 1
         fi
 		runman "$manpath"
@@ -104,7 +104,7 @@ if [ "$#" = 2 ]; then
 elif [ "$#" = 1 ]; then
 	manpath=$(findman $1)
     if [ "$?" -eq 1 ]; then
-	  echo "man: No entry for $1 in the manual."
+	  err "man: No entry for $1 in the manual."
 	  exit 1
     fi
     runman "$manpath"
