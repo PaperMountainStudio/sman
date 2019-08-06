@@ -1,5 +1,6 @@
 #!/bin/sh
-# depends on: groff, zcat, some pager
+# dependencies: groff
+# optional dependencies: zcat, a pager
 
 err() {
     >&2 echo "$@"
@@ -7,7 +8,6 @@ err() {
 }
 
 command -v nroff > /dev/null || err "nroff not found, you might want to install groff"
-command -v zcat > /dev/null || err "zcat not found, you might want to install gzip"
 
 # if manpath is not set
 if [ -z "$MANPATH" ]; then
@@ -49,7 +49,11 @@ runman() {
 	manpath="$1"
 	case "$manpath" in
 	*.gz)
-		catcommand='zcat'
+		if command -v zcat > /dev/null; then
+			catcommand='zcat'
+		else
+			err 'This manpage is compressed, you might want to install gzip'
+		fi
 	  ;;
 	*)
 		catcommand='cat'
