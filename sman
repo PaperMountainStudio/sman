@@ -34,8 +34,10 @@ fi
 # try to guess the best manpager
 for pager in "$MANPAGER" "$PAGER" 'less' 'more' 'cat'; do
     if [ -n "$pager" ]; then
-        manpager="$pager"
-        break
+		if command -v "$pager" > /dev/null; then
+	        manpager="$pager"
+	        break
+		fi
     fi
 done
 if [ -z "$manpager" ]; then
