@@ -31,6 +31,7 @@ if [ -z "$MANPATH" ]; then
 	fi
 fi
 
+# try to guess the best manpager
 for pager in "$MANPAGER" "$PAGER" 'less' 'more' 'cat'; do
     if [ -n "$pager" ]; then
         manpager="$pager"
@@ -45,6 +46,8 @@ usage() {
 	err "usage: man [section] name"
 }
 
+# usage: runman PATH
+# $1 is path to the manpage, for example /usr/share/man/man1/ls.1
 runman() {
 	manpath="$1"
 	case "$manpath" in
@@ -60,6 +63,8 @@ runman() {
 	esac
 	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | col -x  | "$manpager"
 }
+
+# usage: findmani SECTION NAME
 findmani() {
     i="$1"
     name="$2"
@@ -79,8 +84,11 @@ findmani() {
 	done
 	IFS="$oldifs"
 }
+
+# usage: findman NAME
 findman() {
     name="$1"
+	# try every section
     for i in 1 2 3 4 5 6 7 8 9; do
 	  manpath=$(findmani "$i" "$name")
 	  if [ "$?" -eq 0 ]; then
@@ -91,6 +99,7 @@ findman() {
 	return 1
 }
 
+# if the format is 'sman SECTION NAME'
 if [ "$#" = 2 ]; then
 	case "$1" in
 	1|2|3|4|5|6|7|8|9)
@@ -105,6 +114,8 @@ if [ "$#" = 2 ]; then
 		usage
 		exit 1
 	esac
+
+# if the format is 'sman NAME'
 elif [ "$#" = 1 ]; then
 	manpath=$(findman $1)
     if [ "$?" -eq 1 ]; then
