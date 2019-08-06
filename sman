@@ -9,8 +9,26 @@ err() {
 command -v groff > /dev/null || err "groff not found"
 command -v zcat > /dev/null || err "zcat not found, you might want to install gzip"
 
+# if manpath is not set
 if [ -z "$MANPATH" ]; then
-	err '$MANPATH not set'
+	# try /usr/share/man
+	if [ -d "/usr/share/man/" ]; then
+		MANPATH="/usr/share/man"
+	fi
+
+	# try /usr/local/share/man
+	if [ -d "/usr/local/share/man/" ]; then
+		if [ -z "$MANPATH" ]; then
+			MANPATH="/usr/local/share/man"
+		else
+			MANPATH="$MANPATH:/usr/local/share/man"
+		fi
+	fi
+
+	# if manpath is still not set
+	if [ -z "$MANPATH" ]; then
+		err '$MANPATH not set'
+	fi
 fi
 
 for pager in "$MANPAGER" "$PAGER" 'less' 'more' 'cat'; do
