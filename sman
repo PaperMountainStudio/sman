@@ -32,9 +32,13 @@ if [ -z "$MANPATH" ]; then
 fi
 
 # try to guess the best manpager
-for pager in "$MANPAGER" "$PAGER" 'less' 'more' 'cat'; do
+for pager in "$MANPAGER" "$PAGER" 'less -R' 'more' 'cat'; do
     if [ -n "$pager" ]; then
-		if command -v "$pager" > /dev/null; then
+		if [ "$pager" = "less" ]; then
+			pager='less -R'
+		fi
+
+		if command -v $(echo "$pager" | cut -d' ' -f1) > /dev/null; then
 	        manpager="$pager"
 	        break
 		fi
@@ -63,7 +67,7 @@ runman() {
 	*)
 		catcommand='cat'
 	esac
-	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | "$manpager"
+	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | $manpager
 }
 
 # usage: findmani SECTION NAME
