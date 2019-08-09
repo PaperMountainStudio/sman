@@ -11,37 +11,37 @@ command -v nroff > /dev/null || err "nroff not found, you might want to install 
 
 # if manpath is not set
 if [ -z "$MANPATH" ]; then
-	# try /usr/share/man
-	if [ -d "/usr/share/man/" ]; then
-		MANPATH="/usr/share/man"
-	fi
+    # try /usr/share/man
+    if [ -d "/usr/share/man/" ]; then
+        MANPATH="/usr/share/man"
+    fi
 
-	# try /usr/local/share/man
-	if [ -d "/usr/local/share/man/" ]; then
-		if [ -z "$MANPATH" ]; then
-			MANPATH="/usr/local/share/man"
-		else
-			MANPATH="$MANPATH:/usr/local/share/man"
-		fi
-	fi
+    # try /usr/local/share/man
+    if [ -d "/usr/local/share/man/" ]; then
+        if [ -z "$MANPATH" ]; then
+            MANPATH="/usr/local/share/man"
+        else
+            MANPATH="$MANPATH:/usr/local/share/man"
+        fi
+    fi
 
-	# if manpath is still not set
-	if [ -z "$MANPATH" ]; then
-		err '$MANPATH not set'
-	fi
+    # if manpath is still not set
+    if [ -z "$MANPATH" ]; then
+        err '$MANPATH not set'
+    fi
 fi
 
 # try to guess the best manpager
 for pager in "$MANPAGER" "$PAGER" 'less -r' 'more' 'cat'; do
     if [ -n "$pager" ]; then
-		if [ "$pager" = "less" ]; then
-			pager='less -r'
-		fi
+        if [ "$pager" = "less" ]; then
+            pager='less -r'
+        fi
 
-		if command -v $(echo "$pager" | cut -d' ' -f1) > /dev/null; then
-	        manpager="$pager"
-	        break
-		fi
+        if command -v $(echo "$pager" | cut -d' ' -f1) > /dev/null; then
+            manpager="$pager"
+            break
+        fi
     fi
 done
 if [ -z "$manpager" ]; then
@@ -49,25 +49,25 @@ if [ -z "$manpager" ]; then
 fi
 
 usage() {
-	err "usage: man [section] name"
+    err "usage: man [section] name"
 }
 
 # usage: runman PATH
 # $1 is path to the manpage, for example /usr/share/man/man1/ls.1
 runman() {
-	manpath="$1"
-	case "$manpath" in
-	*.gz)
-		if command -v zcat > /dev/null; then
-			catcommand='zcat'
-		else
-			err 'This manpage is compressed, you might want to install gzip'
-		fi
-	  ;;
-	*)
-		catcommand='cat'
-	esac
-	"$catcommand" "$manpath" | nroff -Tutf8 -mandoc | $manpager
+    manpath="$1"
+    case "$manpath" in
+    *.gz)
+        if command -v zcat > /dev/null; then
+            catcommand='zcat'
+        else
+            err 'This manpage is compressed, you might want to install gzip'
+        fi
+      ;;
+    *)
+        catcommand='cat'
+    esac
+    "$catcommand" "$manpath" | nroff -Tutf8 -mandoc | $manpager
 }
 
 # usage: findmani SECTION NAME
@@ -76,60 +76,60 @@ findmani() {
     name="$2"
     
     oldifs="$IFS"
-	IFS=":"
+    IFS=":"
     for manpath in $MANPATH; do
-	    if [ -f "$manpath/man$i/$name.$i" ]; then
-		    echo "$manpath/man$i/$name.$i"
-		    return 0
-		elif [ -f "$manpath/man$i/$name.$i.gz" ]; then
-		    echo "$manpath/man$i/$name.$i.gz"
-		    return 0
-		else
+        if [ -f "$manpath/man$i/$name.$i" ]; then
+            echo "$manpath/man$i/$name.$i"
+            return 0
+        elif [ -f "$manpath/man$i/$name.$i.gz" ]; then
+            echo "$manpath/man$i/$name.$i.gz"
+            return 0
+        else
             return 1
-	    fi
-	done
-	IFS="$oldifs"
+        fi
+    done
+    IFS="$oldifs"
 }
 
 # usage: findman NAME
 findman() {
     name="$1"
-	# try every section
+    # try every section
     for i in 1 2 3 4 5 6 7 8 9; do
-	  manpath=$(findmani "$i" "$name")
-	  if [ "$?" -eq 0 ]; then
-	    echo "$manpath"
-	    return 0
-	  fi
-	done
-	return 1
+      manpath=$(findmani "$i" "$name")
+      if [ "$?" -eq 0 ]; then
+        echo "$manpath"
+        return 0
+      fi
+    done
+    return 1
 }
 
 # if the format is 'sman SECTION NAME'
 if [ "$#" = 2 ]; then
-	case "$1" in
-	1|2|3|4|5|6|7|8|9)
-	    manpath=$(findmani "$1" "$2")
-	    if [ "$?" -eq 1 ]; then
-	      err "man: No entry for $1 in the manual."
-	      exit 1
+    case "$1" in
+    1|2|3|4|5|6|7|8|9)
+        manpath=$(findmani "$1" "$2")
+        if [ "$?" -eq 1 ]; then
+          err "man: No entry for $1 in the manual."
+          exit 1
         fi
-		runman "$manpath"
-		;;
-	*)
-		usage
-		exit 1
-	esac
+        runman "$manpath"
+        ;;
+    *)
+        usage
+        exit 1
+    esac
 
 # if the format is 'sman NAME'
 elif [ "$#" = 1 ]; then
-	manpath=$(findman $1)
+    manpath=$(findman $1)
     if [ "$?" -eq 1 ]; then
-	  err "man: No entry for $1 in the manual."
-	  exit 1
+      err "man: No entry for $1 in the manual."
+      exit 1
     fi
     runman "$manpath"
 else
-	usage
-	exit 1
+    usage
+    exit 1
 fi
