@@ -32,7 +32,7 @@ if [ -z "$MANPATH" ]; then
 fi
 
 # try to guess the best manpager
-for pager in "$MANPAGER" "$PAGER" 'less -r' 'more' 'cat'; do
+for pager in "$MANPAGER" "$PAGER" 'less -r' 'more'; do
     if [ -n "$pager" ]; then
         if [ "$pager" = "less" ]; then
             pager='less -r'
@@ -44,9 +44,6 @@ for pager in "$MANPAGER" "$PAGER" 'less -r' 'more' 'cat'; do
         fi
     fi
 done
-if [ -z "$manpager" ]; then
-    err 'man pager not found'
-fi
 
 usage() {
     err "usage: man [section] name"
@@ -67,7 +64,25 @@ runman() {
     *)
         catcommand='cat'
     esac
-    "$catcommand" "$manpath" | nroff -Tutf8 -mandoc | $manpager
+
+    # construct the command
+    cmd="$catcommand $manpath"
+
+    # use these preprocessors only if they are available
+    command -v eqn > /dev/null && cmd="$cmd | eqn -Tutf8"
+    command -v tbl > /dev/null && cmd="$cmd | tbl"
+    command -v refer > /dev/null && cmd="$cmd | refer"
+
+    # convert to human readable terminal output
+    cmd="$cmd | nroff -Tutf8 -mandoc"
+
+    # get rid of weird characters
+    command -v col > /dev/null && cmd="$cmd | col -x"
+
+    # use manpager if it is defined
+    [ -n "$manpager" ] && cmd="$cmd | $manpager"
+
+    eval "$cmd"
 }
 
 # usage: findmani SECTION NAME
